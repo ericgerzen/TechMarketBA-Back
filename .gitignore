@@ -1,0 +1,18 @@
+# Node.js
+node_modules/
+dist/
+.env
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# OS / temp files
+Thumbs.db
+*.swp
