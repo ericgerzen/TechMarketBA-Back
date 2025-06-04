@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello from TechMarketBA-Back!');
+    res.send('1');
 });
 
 app.listen(PORT, () => {
