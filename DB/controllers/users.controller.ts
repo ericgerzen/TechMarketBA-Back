@@ -62,7 +62,7 @@ const login = async (req: Request, res: Response) => {
 };
 
 
-const getUsuarios = async (_: unknown, res: Response) => {
+const getUsers = async (_: unknown, res: Response) => {
     try {
         const usuarios = await usersService.getAllUsers();
         return res.json(usuarios);
@@ -72,7 +72,7 @@ const getUsuarios = async (_: unknown, res: Response) => {
     }
 };
 
-const getUsuario = async (req: Request, res: Response) => {
+const getUser = async (req: Request, res: Response) => {
     const id_user = Number(req.params.id);
 
     if (!id_user) {
@@ -88,7 +88,7 @@ const getUsuario = async (req: Request, res: Response) => {
     }
 };
 
-const createUsuario = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response) => {
     const { name, surname, email, password } = req.body;
 
     if (!name || !surname || !email || !password) {
@@ -104,7 +104,7 @@ const createUsuario = async (req: Request, res: Response) => {
     }
 };
 
-const updateUsuario = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response) => {
     const { name, surname, email, password } = req.body;
     const id_user = Number(req.params.id);
 
@@ -127,7 +127,7 @@ const updateUsuario = async (req: Request, res: Response) => {
     }
 };
 
-const promoteUsuario = async (req: Request, res: Response) => {
+const promoteUser = async (req: Request, res: Response) => {
     const id_user = Number(req.params.id);
 
     if (!id_user) {
@@ -143,7 +143,7 @@ const promoteUsuario = async (req: Request, res: Response) => {
     }
 };
 
-const deleteUsuario = async (req: Request, res: Response) => {
+const deleteUser = async (req: Request, res: Response) => {
     const id_user = Number(req.params.id);
     try {
         const deletedId = await usersService.deleteUser(id_user);
@@ -157,10 +157,10 @@ const deleteUsuario = async (req: Request, res: Response) => {
 export default {
     login,
     register,
-    getUsuarios,
-    getUsuario,
-    createUsuario,
-    updateUsuario,
-    promoteUsuario,
-    deleteUsuario
+    getUsers,
+    getUser,
+    createUser,
+    updateUser,
+    promoteUser,
+    deleteUser,
 };
