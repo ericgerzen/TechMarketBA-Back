@@ -1,4 +1,4 @@
-import { pool } from "../db.ts";
+import { pool } from "../db";
 import { User } from "../models/user.model";
 
 const getAllUsers = async ():Promise<User[]> => {
