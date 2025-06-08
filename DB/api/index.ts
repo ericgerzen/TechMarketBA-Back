@@ -4,7 +4,7 @@ import cors from 'cors';
 
 const app = express();
 
-import usersRouter from '../routes/users.router.ts';
+import usersRouter from '../routes/users.router';
 
 app.use(express.json());
 
