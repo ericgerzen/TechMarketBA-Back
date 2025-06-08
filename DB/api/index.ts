@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 
+
 const app = express();
 
 import usersRouter from '../routes/users.router.ts';
