@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 
-const JWT_KEY = process.env.JWT_KEY as string;
+const JWTKEY = process.env.JWTKEY as string;
 
 const register = async (req: Request, res: Response):Promise<void> => {
     const { name, surname, email, password } = req.body;
@@ -54,15 +54,15 @@ const login = async (req: Request, res: Response):Promise<void> => {
 
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            res.status(400).json({ message: "Contraseña incorrecta" });
+            res.status(400).json({ message: "Wrong password" });
             return;
         }
 
-        const token = jwt.sign({ id_user: user.id_user }, JWT_KEY, { expiresIn: '4h' });
+        const token = jwt.sign({ id_user: user.id_user }, JWTKEY, { expiresIn: '4h' });
         res.status(200).json({ id_user: user.id_user, token });
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: "Error al iniciar sesión" });
+        res.status(500).json({ message: "Login error" });
     }
 };
 
