@@ -6,8 +6,14 @@ const PORT = 3000;
 
 import usersRouter from './routes/users.router';
 
-app.use(cors());
 app.use(express.json());
+
+const corsOptions = {
+    origin: '*',
+    methods: ['GET', 'PUT', 'POST', 'DELETE']
+};
+
+app.use(cors(corsOptions));
 
 app.get('/', (req: Request, res: Response) => {
     res.send('1');
