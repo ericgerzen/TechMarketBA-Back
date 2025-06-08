@@ -8,17 +8,19 @@ dotenv.config();
 
 const JWT_KEY = process.env.JWT_KEY as string;
 
-const register = async (req: Request, res: Response) => {
+const register = async (req: Request, res: Response):Promise<void> => {
     const { name, surname, email, password } = req.body;
 
     if (!name || !surname || !email || !password) {
-        return res.status(400).json({ message: "Missing fields" });
+        res.status(400).json({ message: "Missing fields" });
+        return;
     }
 
     try {
         const testMail = await usersService.getUserByEmail(email);
         if (testMail) {
-            return res.status(400).json({message: "Email already in use"});
+            res.status(400).json({message: "Email already in use"});
+            return;
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -32,17 +34,18 @@ const register = async (req: Request, res: Response) => {
     }
 };
 
-const login = async (req: Request, res: Response) => {
+const login = async (req: Request, res: Response):Promise<void> => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ message: "Missing fields" });
+        res.status(400).json({ message: "Missing fields" });
+        return;
     }
 
     try {
         const user = await usersService.getUserByEmail(email);
         if (!user) {
-            return res.status(400).json({ message: "User not found" });
+            res.status(400).json({ message: "User not found" });
         }
 
         console.log("Retrieved user:", user);
@@ -50,7 +53,8 @@ const login = async (req: Request, res: Response) => {
 
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            return res.status(400).json({ message: "Contraseña incorrecta" });
+            res.status(400).json({ message: "Contraseña incorrecta" });
+            return;
         }
 
         const token = jwt.sign({ id_user: user.id }, JWT_KEY, { expiresIn: '4h' });
@@ -62,54 +66,57 @@ const login = async (req: Request, res: Response) => {
 };
 
 
-const getUsers = async (_: unknown, res: Response) => {
+const getUsers = async (_: unknown, res: Response):Promise<void> => {
     try {
         const usuarios = await usersService.getAllUsers();
-        return res.json(usuarios);
+        res.json(usuarios);
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
-        return res.status(500).json({ error: errorMessage });
+        res.status(500).json({ error: errorMessage });
     }
 };
 
-const getUser = async (req: Request, res: Response) => {
+const getUser = async (req: Request, res: Response):Promise<void> => {
     const id_user = Number(req.params.id);
 
     if (!id_user) {
-        return res.status(400).json("An id is required")
+        res.status(400).json("An id is required")
+        return;
     }
 
     try {
         const user = await usersService.getUserById(id_user);
-        return res.json(user);
+        res.json(user);
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
-        return res.status(500).json({ error: errorMessage });
+        res.status(500).json({ error: errorMessage });
     }
 };
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response):Promise<void> => {
     const { name, surname, email, password } = req.body;
 
     if (!name || !surname || !email || !password) {
-        return res.status(400).json({ error: "Missing info, fella" });
+        res.status(400).json({ error: "Missing info, fella" });
+        return;
     }
 
     try {
         const newUser = await usersService.createUser(name, surname, email, password);
-        return res.status(201).json(newUser);
+        res.status(201).json(newUser);
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
-        return res.status(500).json({ error: errorMessage });
+        res.status(500).json({ error: errorMessage });
     }
 };
 
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response):Promise<void> => {
     const { name, surname, email, password } = req.body;
     const id_user = Number(req.params.id);
 
     if (!id_user) {
-        return res.status(400).json({ error: "Missing user ID" });
+        res.status(400).json({ error: "Missing user ID" });
+        return;
     }
 
     let hashedPassword: string | undefined = undefined;
@@ -120,37 +127,55 @@ const updateUser = async (req: Request, res: Response) => {
 
     try {
         await usersService.updateUser(id_user, name, surname, email, hashedPassword);
-        return res.json(id_user);
+        res.json(id_user);
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
-        return res.status(500).json({ error: errorMessage });
+        res.status(500).json({ error: errorMessage });
     }
 };
 
-const promoteUser = async (req: Request, res: Response) => {
+const promoteUser = async (req: Request, res: Response):Promise<void> => {
     const id_user = Number(req.params.id);
 
     if (!id_user) {
-        return res.status(400).json({ error: "An id is required" });
+        res.status(400).json({ error: "An id is required" });
+        return;
     }
 
     try {
         const newAdmin = await usersService.promoteUser(id_user);
-        return res.json(newAdmin)
+        res.json(newAdmin)
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
-        return res.status(500).json({ error: errorMessage });
+        res.status(500).json({ error: errorMessage });
     }
 };
 
-const deleteUser = async (req: Request, res: Response) => {
+const crownUser = async (req: Request, res: Response):Promise<void> => {
+    const id_user = Number(req.params.id);
+
+    if (!id_user) {
+        res.status(400).json({ error: "An id is required" });
+        return;
+    }
+
+    try {
+        const newAdmin = await usersService.crownUser(id_user);
+        res.json(newAdmin)
+    } catch (error) {
+        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        res.status(500).json({ error: errorMessage });
+    }
+};
+
+const deleteUser = async (req: Request, res: Response):Promise<void> => {
     const id_user = Number(req.params.id);
     try {
         const deletedId = await usersService.deleteUser(id_user);
-        return res.json(deletedId);
+        res.json(deletedId);
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
-        return res.status(500).json({ error: errorMessage });
+        res.status(500).json({ error: errorMessage });
     }
 };
 
@@ -162,5 +187,6 @@ export default {
     createUser,
     updateUser,
     promoteUser,
+    crownUser,
     deleteUser,
 };

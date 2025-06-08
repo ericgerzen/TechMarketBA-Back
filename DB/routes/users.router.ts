@@ -11,6 +11,7 @@ router.get('/:id', auth.verifyToken, usersController.getUser);
 router.post('/', auth.verifyToken, auth.verifyAdmin, usersController.createUser);
 router.put('/:id', auth.verifyToken, usersController.updateUser);
 router.put('/promote/:id', auth.verifyToken, auth.verifyAdmin, usersController.promoteUser);
+router.put('/crown/:id', auth.verifyToken, auth.verifyAdmin, usersController.crownUser);
 router.delete('/:id', auth.verifyToken, auth.verifyAdmin, usersController.deleteUser);
 
 export default router;

@@ -25,11 +25,25 @@ export const verifyToken = (req: any, res: any, next: any) => {
     }
 }
 
-export const verifyAdmin = async (req: any, res: any, next: any) => {
+export const verifySeller = async (req: any, res: any, next: any) => {
     const id_user = req.id_user;
     try {
         const user = await UsersService.getUserById(id_user);
         if (!user || !user.seller) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+        next();
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error verifying seller status" });
+    }
+}
+
+export const verifyAdmin = async (req: any, res: any, next: any) => {
+    const id_user = req.id_user;
+    try {
+        const user = await UsersService.getUserById(id_user);
+        if (!user || !user.admin) {
             return res.status(403).json({ message: "Access denied" });
         }
         next();
@@ -41,5 +55,6 @@ export const verifyAdmin = async (req: any, res: any, next: any) => {
 
 export default {
     verifyToken,
+    verifySeller,
     verifyAdmin
 }
