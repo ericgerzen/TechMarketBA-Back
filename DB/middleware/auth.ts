@@ -4,7 +4,7 @@ import { JwtPayload} from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-const JWT_KEY = process.env.JWT_KEY as string;
+const JWTKEY = process.env.JWTKEY as string;
 
 export const verifyToken = (req: any, res: any, next: any) => {
     const authHeader = req.headers.authorization;
@@ -14,7 +14,7 @@ export const verifyToken = (req: any, res: any, next: any) => {
 
     const token = authHeader.split(" ")[1];
     try {
-        const verification = jwt.verify(token, JWT_KEY);
+        const verification = jwt.verify(token, JWTKEY);
         if (typeof verification === "object" && verification !== null && "id" in verification) {
             req.id_user = (verification as JwtPayload).id;
             next();
