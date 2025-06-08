@@ -4,7 +4,7 @@ import cors from 'cors';
 const app = express();
 const PORT = 3000;
 
-import usersRouter from './routes/users.router';
+import usersRouter from '../routes/users.router.ts';
 
 app.use(express.json());
 
@@ -21,6 +21,4 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/users', usersRouter);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+export default app;
