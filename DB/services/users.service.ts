@@ -1,5 +1,5 @@
 import { pool } from "../db.ts";
-import { User } from "../models/user.model.ts";
+import { User } from "../models/user.model";
 
 const getAllUsers = async ():Promise<User[]> => {
     const { rows } = await pool.query('SELECT * FROM users');

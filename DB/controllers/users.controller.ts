@@ -1,4 +1,4 @@
-import usersService from "../services/users.service.ts";
+import usersService from "../services/users.service";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -46,10 +46,11 @@ const login = async (req: Request, res: Response):Promise<void> => {
         const user = await usersService.getUserByEmail(email);
         if (!user) {
             res.status(400).json({ message: "User not found" });
+            return;
         }
 
         console.log("Retrieved user:", user);
-        console.log("Retrieved password:", user.pass);
+        console.log("Retrieved password:", user.password);
 
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
@@ -57,8 +58,8 @@ const login = async (req: Request, res: Response):Promise<void> => {
             return;
         }
 
-        const token = jwt.sign({ id_user: user.id }, JWT_KEY, { expiresIn: '4h' });
-        res.status(200).json({ id_user: user.id, token });
+        const token = jwt.sign({ id_user: user.id_user }, JWT_KEY, { expiresIn: '4h' });
+        res.status(200).json({ id_user: user.id_user, token });
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: "Error al iniciar sesión" });
