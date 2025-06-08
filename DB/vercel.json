@@ -1,20 +1,14 @@
 {
   "builds": [
     {
-      "src": "DB/api/index.ts",
+      "src": "api/index.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "DB/api/index.ts"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "DB/api/index.ts"
+      "src": "/api/(.*)",
+      "dest": "api/index.ts"
     }
   ]
 }
