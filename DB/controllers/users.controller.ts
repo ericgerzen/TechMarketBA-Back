@@ -135,24 +135,44 @@ const createUser = async (req: Request, res: Response):Promise<void> => {
     }
 };
 
-const updateUser = async (req: Request, res: Response):Promise<void> => {
+const updateUser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const { name, surname, email, password } = req.body;
     const id_user = Number(req.params.id);
+    const tokenUserId = req.id_user;
 
     if (!id_user) {
         res.status(400).json({ error: "Missing user ID" });
         return;
     }
 
-    let hashedPassword: string | undefined = undefined;
-    if (password) {
-        const salt = await bcrypt.genSalt(10);
-        hashedPassword = await bcrypt.hash(password, salt);
+    if (!tokenUserId) {
+        res.status(401).json({ message: "Unauthorized: Missing user ID in token" });
+        return;
     }
 
     try {
+        const requestingUser = await usersService.getUserById(tokenUserId);
+
+        if (!requestingUser) {
+            res.status(401).json({ message: "Unauthorized: Requesting user not found" });
+            return;
+        }
+
+        const isAdmin = requestingUser.admin;
+
+        if (!isAdmin && id_user !== tokenUserId) {
+            res.status(403).json({ message: "Forbidden: You can only update your own profile" });
+            return;
+        }
+
+        let hashedPassword: string | undefined = undefined;
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            hashedPassword = await bcrypt.hash(password, salt);
+        }
+
         await usersService.updateUser(id_user, name, surname, email, hashedPassword);
-        res.json(id_user);
+        res.json({ id_user });
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
         res.status(500).json({ error: errorMessage });
