@@ -4,10 +4,11 @@ import auth from "../middleware/auth";
 
 const router = Router();
 
-router.get("/", productsController.getProducts);
-router.get('/:id', productsController.getProduct);
-router.get('/category/:category', productsController.getProductByCategory);
+router.get("/", auth.verifyToken, auth.verifyAdmin, productsController.getProducts);
 router.get('/approved', productsController.getApprovedProducts);
+router.get('/category/:category', productsController.getProductByCategory);
+router.get('/:id', auth.verifyToken, auth.verifyAdmin, productsController.getProduct);
+router.get('/approved/:id', productsController.getApprovedProduct);
 router.post('/', auth.verifyToken, auth.verifySeller, productsController.createProduct);
 router.put('/:id', auth.verifyToken, productsController.updateProduct);
 router.put('/approve/:id', auth.verifyToken, auth.verifyAdmin, productsController.approveProduct);
