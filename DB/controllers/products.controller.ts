@@ -101,7 +101,7 @@ const updateProduct = async (req: AuthenticatedRequest, res: Response): Promise<
         return;
     }
 
-    const { name, description, category, model, condition, approved, picture, price } = req.body;
+    const { name, description, category, model, condition, picture, price } = req.body;
 
     try {
         const product = await productsService.getProductById(id_product); // Make sure this returns the user ID who owns the product
@@ -123,7 +123,6 @@ const updateProduct = async (req: AuthenticatedRequest, res: Response): Promise<
             category,
             model,
             condition,
-            approved,
             picture,
             price
         );

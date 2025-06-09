@@ -37,14 +37,13 @@ const createProduct = async (
     category: string,
     model: string,
     condition: string,
-    approved: boolean,
     id_user: number,
     picture: string,
     price: number
 ): Promise<Product> => {
     const { rows } = await pool.query(
         "INSERT INTO products (name, description, category, model, condition, approved, id_user, picture, price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
-        [name, description, category, model, condition, approved, id_user, picture, price]
+        [name, description, category, model, condition, false, id_user, picture, price]
     );
     return rows[0];
 };
