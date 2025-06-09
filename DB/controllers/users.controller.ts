@@ -58,8 +58,8 @@ const login = async (req: Request, res: Response):Promise<void> => {
             return;
         }
 
-        const token = jwt.sign({ id_user: user.id_user }, JWTKEY, { expiresIn: '4h' });
-        res.status(200).json({ id_user: user.id_user, token });
+        const token = jwt.sign({ id: user.id_user }, JWTKEY, { expiresIn: '4h' });
+        res.status(200).json({ id: user.id_user, token });
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: "Login error" });
