@@ -13,6 +13,32 @@ const getProducts = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+const getApprovedProducts = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const products = await productsService.getApprovedProducts();
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching approved products:", error);
+        res.status(500).json({ message: "Could not fetch approved products" });
+    }
+}
+
+const getProductByCategory = async (req: Request, res: Response): Promise<void> => {
+    const category = req.params.category;
+    if (!category) {
+        res.status(400).json({ error: "A category is required" });
+        return;
+    }
+
+    try {
+        const products = await productsService.getProductByCategory(category);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products by category:", error);
+        res.status(500).json({ message: "Could not fetch products by category" });
+    }
+}
+
 const getProduct = async (req: Request, res: Response): Promise<void> => {
     const id_product = Number(req.params.id);
     if (!id_product) {
@@ -150,6 +176,8 @@ const deleteProduct = async (req: AuthenticatedRequest, res: Response): Promise<
 
 export default {
     getProducts,
+    getApprovedProducts,
+    getProductByCategory,
     getProduct,
     createProduct,
     updateProduct,

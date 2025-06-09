@@ -6,6 +6,8 @@ const router = Router();
 
 router.get("/", productsController.getProducts);
 router.get('/:id', productsController.getProduct);
+router.get('/category/:category', productsController.getProductByCategory);
+router.get('/approved', productsController.getApprovedProducts);
 router.post('/', auth.verifyToken, auth.verifySeller, productsController.createProduct);
 router.put('/:id', auth.verifyToken, productsController.updateProduct);
 router.put('/approve/:id', auth.verifyToken, auth.verifyAdmin, productsController.approveProduct);

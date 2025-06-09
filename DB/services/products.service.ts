@@ -6,6 +6,16 @@ const getAllProducts = async ():Promise<Product[]> => {
     return rows;
 };
 
+const getApprovedProducts = async ():Promise<Product[]> => {
+    const { rows } = await pool.query('SELECT * FROM products WHERE approved = true');
+    return rows;
+}
+
+const getProductByCategory = async (category: string): Promise<Product[]> => {
+    const { rows } = await pool.query("SELECT * FROM products WHERE category = $1", [category]);
+    return rows;
+}
+
 const getProductById = async (id_product:number) :Promise<Product | null> => {
     const { rows } = await pool.query("SELECT * FROM products WHERE id_product = $1", [id_product]);
     return rows[0] || null;
@@ -107,6 +117,8 @@ const deleteProduct = async (id_product: number): Promise<number> => {
 
 export default {
     getAllProducts,
+    getApprovedProducts,
+    getProductByCategory,
     getProductById,
     getProductByUser,
     createProduct,
