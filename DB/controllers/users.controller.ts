@@ -1,4 +1,5 @@
 import usersService from "../services/users.service";
+import { AuthenticatedRequest} from "../types/customRequest";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -77,22 +78,45 @@ const getUsers = async (_: unknown, res: Response):Promise<void> => {
     }
 };
 
-const getUser = async (req: Request, res: Response):Promise<void> => {
-    const id_user = Number(req.params.id);
+const getUser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const requestedId = Number(req.params.id);
+    const tokenUserId = req.id_user;
 
-    if (!id_user) {
-        res.status(400).json("An id is required")
+    if (!tokenUserId) {
+        res.status(401).json({ message: "Unauthorized: Missing user ID" });
         return;
     }
 
     try {
-        const user = await usersService.getUserById(id_user);
-        res.json(user);
+        const requestingUser = await usersService.getUserById(tokenUserId);
+
+        if (!requestingUser) {
+            res.status(401).json({ message: "Unauthorized: User not found" });
+            return;
+        }
+
+        const isAdmin = requestingUser.admin;
+
+        if (!isAdmin && requestedId !== tokenUserId) {
+            res.status(403).json({ message: "Forbidden: Access denied" });
+            return;
+        }
+
+        const user = await usersService.getUserById(requestedId);
+
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        res.status(200).json(user);
     } catch (error) {
-        const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
         res.status(500).json({ error: errorMessage });
     }
 };
+
+
 
 const createUser = async (req: Request, res: Response):Promise<void> => {
     const { name, surname, email, password } = req.body;
