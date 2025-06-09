@@ -79,7 +79,7 @@ const createProduct = async (req: Request, res: Response): Promise<void> => {
     const { name, description, category, model, condition, id_user, picture, price } = req.body;
 
     try {
-        const newProduct = await productsService.createProduct(name, description, category, model, condition, approved, id_user, picture, price);
+        const newProduct = await productsService.createProduct(name, description, category, model, condition, id_user, picture, price);
         res.status(201).json(newProduct);
     } catch (error) {
         console.error("Error creating product:", error);
