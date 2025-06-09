@@ -18,6 +18,8 @@ export const verifyToken = (req: any, res: any, next: any) => {
         if (typeof verification === "object" && verification !== null && "id" in verification) {
             req.id_user = (verification as JwtPayload).id;
             next();
+        } else {
+            return res.status(401).json({ message: "Invalid token structure" });
         }
     } catch (error) {
         console.log(error);
