@@ -4,7 +4,7 @@ import auth from "../middleware/auth";
 
 const router = Router();
 
-router.get("/", auth.verifyToken, auth.verifyAdmin, productsController.getProducts);
+router.get("/", productsController.getProducts);
 router.get('/:id', auth.verifyToken, productsController.getProduct);
 router.post('/', auth.verifyToken, auth.verifySeller, productsController.createProduct);
 router.put('/:id', auth.verifyToken, productsController.updateProduct);
