@@ -1,0 +1,7 @@
+The sole purpose of this file is to exist inside the uploads directory.
+It does not contain any meaningful content.
+It does not affect the functionality of the application in any way.
+It lacks meaning.
+It lacks any greater purpose.
+Pretty sad file, isn't it?
+
