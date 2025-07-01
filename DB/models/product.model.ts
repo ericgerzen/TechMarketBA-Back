@@ -7,6 +7,12 @@ export interface Product {
     condition: string;
     approved: boolean;
     id_user: number;
-    picture: string;
     price: number;
+    // Removed 'picture' property since images are now in a separate table
+}
+
+export interface Image {
+    id_image: number;
+    link: string;
+    id_product: number;
 }

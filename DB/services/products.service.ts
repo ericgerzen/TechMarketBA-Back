@@ -38,12 +38,11 @@ const createProduct = async (
     model: string,
     condition: string,
     id_user: number,
-    picture: string,
     price: number
 ): Promise<Product> => {
     const { rows } = await pool.query(
         "INSERT INTO products (name, description, category, model, condition, approved, id_user, picture, price) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
-        [name, description, category, model, condition, false, id_user, picture, price]
+        [name, description, category, model, condition, false, id_user, price]
     );
     return rows[0];
 };
@@ -56,7 +55,6 @@ const updateProduct = async (
     model?: string,
     condition?: string,
     approved?: boolean,
-    picture?: string,
     price?: number
 ): Promise<Product> => {
     const fields = [];
@@ -86,10 +84,6 @@ const updateProduct = async (
     if (approved !== undefined) {
         fields.push(`approved = $${fields.length + 1}`);
         values.push(approved);
-    }
-    if (picture) {
-        fields.push(`picture = $${fields.length + 1}`);
-        values.push(picture);
     }
     if (price !== undefined) {
         fields.push(`price = $${fields.length + 1}`);
