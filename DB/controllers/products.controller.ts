@@ -76,22 +76,11 @@ const getApprovedProduct = async (req: Request, res: Response): Promise<void> =>
 }
 
 const createProduct = async (req: Request, res: Response): Promise<void> => {
-    const { name, description, category, model, condition, id_user, price } = req.body;
-    // req.files will be an array of files if using multer.array()
-    const files = req.files as Express.Multer.File[];
+    const { name, description, category, model, condition, id_user, picture, price } = req.body;
+
     try {
-        // 1. Create the product (no picture field)
-        const newProduct = await productsService.createProduct(name, description, category, model, condition, id_user, price);
-        // 2. For each image, upload to Cloudinary and save link in DB
-        let images = [];
-        if (files && files.length > 0) {
-            for (const file of files) {
-                const result = await require('../cloudinary').default.uploader.upload(file.path, { folder: 'products' });
-                const image = await require('../services/images.service').addImage(result.secure_url, newProduct.id_product);
-                images.push(image);
-            }
-        }
-        res.status(201).json({ product: newProduct, images });
+        const newProduct = await productsService.createProduct(name, description, category, model, condition, id_user, picture, price);
+        res.status(201).json(newProduct);
     } catch (error) {
         console.error("Error creating product:", error);
         res.status(500).json({ message: "Could not create product" });
