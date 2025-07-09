@@ -1,5 +1,5 @@
 import usersService from "../services/users.service";
-import { AuthenticatedRequest} from "../types/customRequest";
+import { AuthenticatedRequest } from "../types/customRequest";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";

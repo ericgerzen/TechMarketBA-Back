@@ -6,6 +6,7 @@ const app = express();
 
 import usersRouter from '../routes/users.router';
 import productsRouter from '../routes/products.router';
+import imagesRouter from '../routes/images.router';
 
 app.use(express.json());
 
@@ -22,5 +23,6 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
+app.use('/images', imagesRouter);
 
 export default app;
