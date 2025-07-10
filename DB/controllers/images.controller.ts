@@ -48,20 +48,26 @@ const getImagesByProductId = async (req: Request, res: Response): Promise<void> 
     }
 };
 
-const createImage = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    const { link, id_product } = req.body;
-
-    if (!link || !id_product) {
-        res.status(400).json({ error: "Link and product ID are required" });
-        return;
-    }
-
+export const uploadImages = async (req: Request, res: Response) => {
     try {
-        const newImage = await imagesService.createImage(link, id_product);
-        res.status(201).json(newImage);
+        const files = req.files as Express.Multer.File[];
+        const id_product = parseInt(req.params.id_product);
+
+        if (!files || files.length === 0) {
+            return res.status(400).json({ error: "No files uploaded." });
+        }
+
+        const uploadedImages = await Promise.all(
+            files.map(file => imagesService.createImage(file, id_product))
+        );
+
+        return res.status(201).json({
+            message: "Images uploaded and saved successfully.",
+            images: uploadedImages,
+        });
     } catch (error) {
-        console.error("Error creating image:", error);
-        res.status(500).json({ message: "Could not create image" });
+        console.error("Error uploading images:", error);
+        return res.status(500).json({ error: "Failed to upload images." });
     }
 };
 
@@ -92,6 +98,6 @@ export default {
     getAllImages,
     getImageById,
     getImagesByProductId,
-    createImage,
+    uploadImages,
     deleteImage
 };

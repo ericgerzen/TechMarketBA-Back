@@ -76,10 +76,10 @@ const getApprovedProduct = async (req: Request, res: Response): Promise<void> =>
 }
 
 const createProduct = async (req: Request, res: Response): Promise<void> => {
-    const { name, description, category, model, condition, id_user, picture, price } = req.body;
+    const { name, description, category, model, condition, id_user, price } = req.body;
 
     try {
-        const newProduct = await productsService.createProduct(name, description, category, model, condition, id_user, picture, price);
+        const newProduct = await productsService.createProduct(name, description, category, model, condition, id_user, price);
         res.status(201).json(newProduct);
     } catch (error) {
         console.error("Error creating product:", error);
@@ -101,10 +101,10 @@ const updateProduct = async (req: AuthenticatedRequest, res: Response): Promise<
         return;
     }
 
-    const { name, description, category, model, condition, picture, price } = req.body;
+    const { name, description, category, model, condition, price } = req.body;
 
     try {
-        const product = await productsService.getProductById(id_product); // Make sure this returns the user ID who owns the product
+        const product = await productsService.getProductById(id_product);
 
         if (!product) {
             res.status(404).json({ message: "Product not found" });
@@ -123,7 +123,6 @@ const updateProduct = async (req: AuthenticatedRequest, res: Response): Promise<
             category,
             model,
             condition,
-            picture,
             price
         );
 

@@ -7,6 +7,5 @@ export interface Product {
     condition: string;
     approved: boolean;
     id_user: number;
-    picture: string;
     price: number;
 }
