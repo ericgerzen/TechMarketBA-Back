@@ -48,26 +48,27 @@ const getImagesByProductId = async (req: Request, res: Response): Promise<void> 
     }
 };
 
-export const uploadImages = async (req: Request, res: Response) => {
+export const uploadImages = async (req: Request, res: Response): Promise<void> => {
     try {
         const files = req.files as Express.Multer.File[];
         const id_product = parseInt(req.params.id_product);
 
         if (!files || files.length === 0) {
-            return res.status(400).json({ error: "No files uploaded." });
+            res.status(400).json({ error: "No files uploaded." });
+            return;
         }
 
         const uploadedImages = await Promise.all(
             files.map(file => imagesService.createImage(file, id_product))
         );
 
-        return res.status(201).json({
+        res.status(201).json({
             message: "Images uploaded and saved successfully.",
             images: uploadedImages,
         });
     } catch (error) {
         console.error("Error uploading images:", error);
-        return res.status(500).json({ error: "Failed to upload images." });
+        res.status(500).json({ error: "Failed to upload images." });
     }
 };
 
