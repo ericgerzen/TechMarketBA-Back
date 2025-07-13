@@ -51,7 +51,12 @@ const getImagesByProductId = async (req: Request, res: Response): Promise<void> 
 export const uploadImages = async (req: Request, res: Response): Promise<void> => {
     try {
         const files = req.files as Express.Multer.File[];
-        const id_product = parseInt(req.params.id_product);
+        const id_product = parseInt(req.body.id_product);
+
+        if (!id_product || isNaN(id_product)) {
+            res.status(400).json({ error: "id_product is required and must be a number." });
+            return;
+        }
 
         if (!files || files.length === 0) {
             res.status(400).json({ error: "No files uploaded." });
