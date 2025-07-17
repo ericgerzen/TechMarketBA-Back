@@ -1,34 +1,81 @@
 import { pool } from "../db";
 import { Product } from "../models/product.model";
 
-const getAllProducts = async ():Promise<Product[]> => {
-    const { rows } = await pool.query('SELECT * FROM products');
+const getAllProducts = async (): Promise<any[]> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM products p
+        LEFT JOIN images i ON p.id_product = i.id_product
+        GROUP BY p.id_product
+    `);
     return rows;
 };
 
-const getApprovedProducts = async ():Promise<Product[]> => {
-    const { rows } = await pool.query('SELECT * FROM products WHERE approved = true');
+const getApprovedProducts = async (): Promise<any[]> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM products p
+        LEFT JOIN images i ON p.id_product = i.id_product
+        WHERE p.approved = true
+        GROUP BY p.id_product
+    `);
     return rows;
-}
+};
 
-const getProductByCategory = async (category: string): Promise<Product[]> => {
-    const { rows } = await pool.query("SELECT * FROM products WHERE category = $1 AND approved = true", [category]);
+const getProductByCategory = async (category: string): Promise<any[]> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM products p
+        LEFT JOIN images i ON p.id_product = i.id_product
+        WHERE p.category = $1 AND p.approved = true
+        GROUP BY p.id_product
+    `, [category]);
     return rows;
-}
+};
 
-const getProductById = async (id_product:number) :Promise<Product | null> => {
-    const { rows } = await pool.query("SELECT * FROM products WHERE id_product = $1", [id_product]);
+const getProductById = async (id_product: number): Promise<any | null> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM products p
+        LEFT JOIN images i ON p.id_product = i.id_product
+        WHERE p.id_product = $1
+        GROUP BY p.id_product
+    `, [id_product]);
     return rows[0] || null;
 };
 
-const getApprovedProductById = async (id_product: number): Promise<Product | null> => {
-    const { rows } = await pool.query("SELECT * FROM products WHERE id_product = $1 AND approved = true", [id_product]);
+const getApprovedProductById = async (id_product: number): Promise<any | null> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM products p
+        LEFT JOIN images i ON p.id_product = i.id_product
+        WHERE p.id_product = $1 AND p.approved = true
+        GROUP BY p.id_product
+    `, [id_product]);
     return rows[0] || null;
-}
+};
 
-const getProductByUser = async (id_user:number): Promise<Product | null> => {
-    const { rows } = await pool.query("SELECT * FROM products WHERE id_user = $1", [id_user]);
-    return rows[0] || null;
+const getProductByUser = async (id_user: number): Promise<any[]> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM products p
+        LEFT JOIN images i ON p.id_product = i.id_product
+        WHERE p.id_user = $1
+        GROUP BY p.id_product
+    `, [id_user]);
+    return rows;
 };
 
 const createProduct = async (
