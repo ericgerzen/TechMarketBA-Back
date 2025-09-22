@@ -171,7 +171,7 @@ const updateUser = async (req: AuthenticatedRequest, res: Response): Promise<voi
             hashedPassword = await bcrypt.hash(password, salt);
         }
 
-        await usersService.updateUser(id_user, name, surname, email, hashedPassword), description;
+        await usersService.updateUser(id_user, name, surname, email, hashedPassword, description);
         res.json({ id_user });
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
