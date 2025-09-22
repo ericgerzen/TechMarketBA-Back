@@ -4,6 +4,7 @@ export interface User {
     surname: string;
     email: string;
     password: string;
+    description: string;
     seller: boolean;
     admin: boolean;
 }

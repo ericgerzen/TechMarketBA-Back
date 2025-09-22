@@ -23,7 +23,7 @@ const createUser = async (
     password: string
 ): Promise<User> => {
     const { rows } = await pool.query(
-        "INSERT INTO users (name, surname, email, password, seller, admin) VALUES ($1, $2, $3, $4, false, false) RETURNING *",
+        "INSERT INTO users (name, surname, email, password, description, seller, admin) VALUES ($1, $2, $3, $4, '', false, false) RETURNING *",
         [name, surname, email, password]
     );
     return rows[0];
@@ -34,7 +34,8 @@ const updateUser = async (
     name?: string,
     surname?: string,
     email?: string,
-    password?: string
+    password?: string,
+    description?: string
 ): Promise<User> => {
     const fields = [];
     const values = [];
@@ -55,6 +56,10 @@ const updateUser = async (
     if (password) {
         fields.push(`password = $${fields.length + 1}`);
         values.push(password);
+    }
+    if (description) {
+        fields.push(`description = $${fields.length + 1}`);
+        values.push(description);
     }
 
     if (fields.length === 0) {
