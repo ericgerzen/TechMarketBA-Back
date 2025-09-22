@@ -136,7 +136,7 @@ const createUser = async (req: Request, res: Response):Promise<void> => {
 };
 
 const updateUser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    const { name, surname, email, password } = req.body;
+    const { name, surname, email, password, description } = req.body;
     const id_user = Number(req.params.id);
     const tokenUserId = req.id_user;
 
@@ -171,7 +171,7 @@ const updateUser = async (req: AuthenticatedRequest, res: Response): Promise<voi
             hashedPassword = await bcrypt.hash(password, salt);
         }
 
-        await usersService.updateUser(id_user, name, surname, email, hashedPassword);
+        await usersService.updateUser(id_user, name, surname, email, hashedPassword), description;
         res.json({ id_user });
     } catch (error) {
         const errorMessage = (error instanceof Error) ? error.message : "Unknown error";
