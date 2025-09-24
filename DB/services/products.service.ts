@@ -72,6 +72,19 @@ const getProductByUser = async (id_user: number): Promise<any[]> => {
             COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
         FROM products p
         LEFT JOIN images i ON p.id_product = i.id_product
+        WHERE p.id_user = $1 AND p.approved = true
+        GROUP BY p.id_product
+    `, [id_user]);
+    return rows;
+};
+
+const getProductByUserSelf = async (id_user: number): Promise<any[]> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM products p
+        LEFT JOIN images i ON p.id_product = i.id_product
         WHERE p.id_user = $1
         GROUP BY p.id_product
     `, [id_user]);
@@ -167,6 +180,7 @@ export default {
     getProductById,
     getApprovedProductById,
     getProductByUser,
+    getProductByUserSelf,
     createProduct,
     updateProduct,
     approveProduct,

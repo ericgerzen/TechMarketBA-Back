@@ -207,6 +207,21 @@ const getProductByUser = async (req: Request, res: Response): Promise<void> => {
     }
 }
 
+const getProductByUserSelf = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const id_user = req.id_user;
+    if (!id_user) {
+        res.status(401).json({ error: "Unauthorized: missing user ID" });
+        return;
+    }
+    try {
+        const products = await productsService.getProductByUserSelf(id_user);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products for self:", error);
+        res.status(500).json({ message: "Could not fetch products for user" });
+    }
+}
+
 export default {
     getProducts,
     getApprovedProducts,
@@ -217,5 +232,6 @@ export default {
     updateProduct,
     approveProduct,
     deleteProduct,
-    getProductByUser
+    getProductByUser,
+    getProductByUserSelf
 };
