@@ -89,6 +89,14 @@ const deleteUser = async (id_user: number): Promise<number> => {
     return id_user;
 };
 
+const getUserForAny = async (id_user: number): Promise<{ name: string; surname: string; description: string } | null> => {
+    const { rows } = await pool.query(
+        "SELECT name, surname, description FROM users WHERE id_user = $1",
+        [id_user]
+    );
+    return rows[0] || null;
+};
+
 export default {
     getAllUsers,
     getUserById,
@@ -98,4 +106,5 @@ export default {
     promoteUser,
     crownUser,
     deleteUser,
+    getUserForAny,
 };

@@ -224,6 +224,25 @@ const deleteUser = async (req: Request, res: Response):Promise<void> => {
     }
 };
 
+const getUserForAny = async (req: Request, res: Response): Promise<void> => {
+    const id_user = Number(req.params.id);
+    if (!id_user) {
+        res.status(400).json({ error: "Missing user ID" });
+        return;
+    }
+    try {
+        const user = await usersService.getUserForAny(id_user);
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        res.status(500).json({ error: errorMessage });
+    }
+};
+
 export default {
     login,
     register,
@@ -234,4 +253,5 @@ export default {
     promoteUser,
     crownUser,
     deleteUser,
+    getUserForAny,
 };

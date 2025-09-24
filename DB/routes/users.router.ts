@@ -8,6 +8,7 @@ router.post("/register", usersController.register);
 router.post("/login", usersController.login);
 router.get("/", auth.verifyToken, auth.verifyAdmin, usersController.getUsers);
 router.get('/:id', auth.verifyToken, usersController.getUser);
+router.get('/public/:id', usersController.getUserForAny);
 router.post('/', auth.verifyToken, auth.verifyAdmin, usersController.createUser);
 router.put('/:id', auth.verifyToken, usersController.updateUser);
 router.put('/promote/:id', auth.verifyToken, auth.verifyAdmin, usersController.promoteUser);
