@@ -192,6 +192,21 @@ const deleteProduct = async (req: AuthenticatedRequest, res: Response): Promise<
     }
 };
 
+const getProductByUser = async (req: Request, res: Response): Promise<void> => {
+    const id_user = Number(req.params.id);
+    if (!id_user) {
+        res.status(400).json({ error: "A user id is required" });
+        return;
+    }
+    try {
+        const products = await productsService.getProductByUser(id_user);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products by user:", error);
+        res.status(500).json({ message: "Could not fetch products by user" });
+    }
+}
+
 export default {
     getProducts,
     getApprovedProducts,
@@ -201,5 +216,6 @@ export default {
     createProduct,
     updateProduct,
     approveProduct,
-    deleteProduct
+    deleteProduct,
+    getProductByUser
 };

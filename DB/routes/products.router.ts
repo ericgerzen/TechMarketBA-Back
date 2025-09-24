@@ -13,5 +13,6 @@ router.post('/', auth.verifyToken, auth.verifySeller, productsController.createP
 router.put('/:id', auth.verifyToken, productsController.updateProduct);
 router.put('/approve/:id', auth.verifyToken, auth.verifyAdmin, productsController.approveProduct);
 router.delete('/:id', auth.verifyToken, productsController.deleteProduct);
+router.get('/user/:id', productsController.getProductByUser);
 
 export default router;
