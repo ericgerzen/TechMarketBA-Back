@@ -75,8 +75,14 @@ const getApprovedProduct = async (req: Request, res: Response): Promise<void> =>
     }
 }
 
-const createProduct = async (req: Request, res: Response): Promise<void> => {
-    const { name, description, category, model, condition, id_user, price } = req.body;
+const createProduct = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const { name, description, category, model, condition, price } = req.body;
+    const id_user = req.id_user;
+
+    if (!id_user) {
+        res.status(401).json({ error: "Unauthorized: missing user ID" });
+        return;
+    }
 
     try {
         const newProduct = await productsService.createProduct(name, description, category, model, condition, id_user, price);
