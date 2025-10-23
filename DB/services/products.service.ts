@@ -103,6 +103,34 @@ const getProductByUserSelf = async (id_user: number): Promise<any[]> => {
     return rows;
 };
 
+const getCart = async (id_user: number): Promise<any[]> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM cart c
+        JOIN products p ON c.id_product = p.id_product
+        LEFT JOIN images i ON p.id_product = i.id_product
+        WHERE c.id_user = $1
+        GROUP BY p.id_product
+    `, [id_user]);
+    return rows;
+}
+
+const getFavourite = async (id_user: number): Promise<any[]> => {
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
+        FROM favourite f
+        JOIN products p ON c.id_product = p.id_product
+        LEFT JOIN images i ON p.id_product = i.id_product
+        WHERE f.id_user = $1
+        GROUP BY p.id_product
+    `, [id_user]);
+    return rows;
+}
+
 const createProduct = async (
     name: string,
     description: string,
@@ -178,12 +206,36 @@ const updateProduct = async (
 const approveProduct = async (id_product: number): Promise<number> => {
     await pool.query("UPDATE products SET approved = true WHERE id_product = $1", [id_product]);
     return id_product;
-}
+};
+
+const addToCart = async (id_user: number, id_product: number): Promise<any> => {
+    const { rows } = await pool.query(
+        "INSERT INTO cart (id_user, id_product) VALUES ($1, $2) RETURNING *",
+        [id_user, id_product]
+    );
+    return rows[0];
+};
+
+const addToFavourite = async (id_user: number, id_product: number): Promise<any> => {
+    const { rows } = await pool.query(
+        "INSERT INTO favourite (id_user, id_product) VALUES ($1, $2) RETURNING *",
+        [id_user, id_product]
+    );
+    return rows[0];
+};
 
 const deleteProduct = async (id_product: number): Promise<number> => {
     await pool.query("DELETE FROM products WHERE id_product = $1", [id_product]);
     return id_product;
 };
+
+const deleteFromCart = async (id_cart: number): Promise<void> => {
+    await pool.query("DELETE FROM cart WHERE id_cart = $1", [id_cart]);
+}
+
+const deleteFromFavourite = async (id_favourite: number): Promise<void> => {
+    await pool.query("DELETE FROM favourite WHERE id_favourite = $1", [id_favourite]);
+}
 
 export default {
     getAllProducts,
@@ -193,8 +245,14 @@ export default {
     getApprovedProductById,
     getProductByUser,
     getProductByUserSelf,
+    getCart,
+    getFavourite,
     createProduct,
     updateProduct,
     approveProduct,
-    deleteProduct
+    addToCart,
+    addToFavourite,
+    deleteProduct,
+    deleteFromCart,
+    deleteFromFavourite
 };

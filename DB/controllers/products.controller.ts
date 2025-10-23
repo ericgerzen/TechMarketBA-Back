@@ -75,6 +75,66 @@ const getApprovedProduct = async (req: Request, res: Response): Promise<void> =>
     }
 }
 
+const getProductByUser = async (req: Request, res: Response): Promise<void> => {
+    const id_user = Number(req.params.id);
+    if (!id_user) {
+        res.status(400).json({ error: "A user id is required" });
+        return;
+    }
+    try {
+        const products = await productsService.getProductByUser(id_user);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products by user:", error);
+        res.status(500).json({ message: "Could not fetch products by user" });
+    }
+}
+
+const getProductByUserSelf = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const id_user = req.id_user;
+    if (!id_user) {
+        res.status(401).json({ error: "Unauthorized: missing user ID" });
+        return;
+    }
+    try {
+        const products = await productsService.getProductByUserSelf(id_user);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products for self:", error);
+        res.status(500).json({ message: "Could not fetch products for user" });
+    }
+}
+
+const getCart = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const id_user = req.id_user;
+    if (!id_user) {
+        res.status(401).json({ error: "Unauthorized: missing user ID" });
+        return;
+    }
+    try {
+        const products = await productsService.getCart(id_user);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching cart:", error);
+        res.status(500).json({ message: "Could not fetch cart for user" });
+    }
+}
+
+const getFavourite = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const id_user = req.id_user;
+    if (!id_user) {
+        res.status(401).json({ error: "Unauthorized: missing user ID" });
+        return;
+    }
+    try {
+        const products = await productsService.getFavourite(id_user);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching cart:", error);
+        res.status(500).json({ message: "Could not fetch cart for user" });
+    }
+}
+
 const createProduct = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const { name, description, category, model, condition, price } = req.body;
     const id_user = req.id_user;
@@ -155,6 +215,52 @@ const approveProduct = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+const addToCart = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const id_product = Number(req.params.id);
+    const id_user = req.id_user;
+
+    if (!id_product) {
+        res.status(400).json({ error: "An id is required" });
+        return;
+    }
+
+    if (!id_user) {
+        res.status(401).json({ error: "Unauthorized: missing user ID" });
+        return;
+    }
+
+    try {
+        await productsService.addToCart(id_user, id_product);
+        res.status(200).json({ message: "Product added to cart" });
+    } catch (error) {
+        console.error("Error adding product to cart:", error);
+        res.status(500).json({ message: "Could not add product to cart" });
+    }
+};
+
+const addToFavourite = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const id_product = Number(req.params.id);
+    const id_user = req.id_user;
+
+    if (!id_product) {
+        res.status(400).json({ error: "An id is required" });
+        return;
+    }
+
+    if (!id_user) {
+        res.status(401).json({ error: "Unauthorized: missing user ID" });
+        return;
+    }
+
+    try {
+        await productsService.addToFavourite(id_user, id_product);
+        res.status(200).json({ message: "Product added to cart" });
+    } catch (error) {
+        console.error("Error adding product to cart:", error);
+        res.status(500).json({ message: "Could not add product to cart" });
+    }
+};
+
 const deleteProduct = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const id_product = Number(req.params.id);
     const tokenUserId = req.id_user;
@@ -198,33 +304,37 @@ const deleteProduct = async (req: AuthenticatedRequest, res: Response): Promise<
     }
 };
 
-const getProductByUser = async (req: Request, res: Response): Promise<void> => {
-    const id_user = Number(req.params.id);
-    if (!id_user) {
-        res.status(400).json({ error: "A user id is required" });
+const deleteFromCart = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const id_cart = Number(req.params.id);
+
+    if (!id_cart) {
+        res.status(400).json({ error: "An id is required" });
         return;
     }
+
     try {
-        const products = await productsService.getProductByUser(id_user);
-        res.status(200).json(products);
+        await productsService.deleteFromCart(id_cart);
+        res.status(200).json({ message: "Product removed from favourite" });
     } catch (error) {
-        console.error("Error fetching products by user:", error);
-        res.status(500).json({ message: "Could not fetch products by user" });
+        console.error("Error removing product from favourite:", error);
+        res.status(500).json({ message: "Could not remove product from favourite" });
     }
 }
 
-const getProductByUserSelf = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    const id_user = req.id_user;
-    if (!id_user) {
-        res.status(401).json({ error: "Unauthorized: missing user ID" });
+const deleteFromFavourite = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    const id_cart = Number(req.params.id);
+
+    if (!id_cart) {
+        res.status(400).json({ error: "An id is required" });
         return;
     }
+
     try {
-        const products = await productsService.getProductByUserSelf(id_user);
-        res.status(200).json(products);
+        await productsService.deleteFromFavourite(id_cart);
+        res.status(200).json({ message: "Product removed from favourite" });
     } catch (error) {
-        console.error("Error fetching products for self:", error);
-        res.status(500).json({ message: "Could not fetch products for user" });
+        console.error("Error removing product from favourite:", error);
+        res.status(500).json({ message: "Could not remove product from favourite" });
     }
 }
 
@@ -234,10 +344,16 @@ export default {
     getProductByCategory,
     getProduct,
     getApprovedProduct,
+    getProductByUser,
+    getProductByUserSelf,
+    getCart,
+    getFavourite,
     createProduct,
     updateProduct,
     approveProduct,
+    addToCart,
+    addToFavourite,
     deleteProduct,
-    getProductByUser,
-    getProductByUserSelf
+    deleteFromCart,
+    deleteFromFavourite
 };
