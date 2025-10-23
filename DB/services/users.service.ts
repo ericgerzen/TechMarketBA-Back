@@ -1,5 +1,7 @@
 import { pool } from "../db";
 import { User } from "../models/user.model";
+import cloudinary from '../middleware/cloudinary';
+import {Image} from "../models/image.model";
 
 const getAllUsers = async ():Promise<User[]> => {
     const { rows } = await pool.query('SELECT * FROM users');
@@ -23,7 +25,7 @@ const createUser = async (
     password: string
 ): Promise<User> => {
     const { rows } = await pool.query(
-        "INSERT INTO users (name, surname, email, password, description, seller, admin) VALUES ($1, $2, $3, $4, '', false, false) RETURNING *",
+        "INSERT INTO users (name, surname, email, password, description, seller, admin, picture) VALUES ($1, $2, $3, $4, '', false, false, null) RETURNING *",
         [name, surname, email, password]
     );
     return rows[0];
@@ -74,6 +76,26 @@ const updateUser = async (
     return rows[0];
 };
 
+const setProfilePicture = async (file: Express.Multer.File, id_user: number): Promise<Image> => {
+    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+            { folder: "users" },
+            (err, result) => {
+                if (err || !result) return reject(err);
+                resolve(result);
+            }
+        ).end(file.buffer);
+    });
+
+    const link = result.secure_url;
+
+    const { rows } = await pool.query(
+        "UPDATE users SET picture = $1 WHERE id_user = $2", [link, id_user]
+    );
+
+    return rows[0];
+};
+
 const promoteUser = async (id_user: number): Promise<number> => {
     await pool.query("UPDATE users SET seller = true WHERE id_user = $1", [id_user]);
     return id_user;
@@ -105,6 +127,7 @@ export default {
     updateUser,
     promoteUser,
     crownUser,
+    setProfilePicture,
     deleteUser,
     getUserForAny,
 };

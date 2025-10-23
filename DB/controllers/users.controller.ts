@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import imagesService from "../services/images.service";
 dotenv.config();
 
 
@@ -213,6 +214,28 @@ const crownUser = async (req: Request, res: Response):Promise<void> => {
     }
 };
 
+export const setProfilePicture = async (req: Request, res: Response): Promise<void> => {
+    try {
+
+        const id_user = (req as any).id_user || req.body.id_user || req.params.id;
+        if (!id_user) {
+            res.status(400).json({ error: "Missing user ID" });
+            return;
+        }
+
+        if (!req.file) {
+            res.status(400).json({ error: "No file uploaded" });
+            return;
+        }
+
+        const result = await usersService.setProfilePicture(req.file, Number(id_user));
+        res.status(200).json({ message: "Profile picture updated", picture: result });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        res.status(500).json({ error: errorMessage });
+    }
+};
+
 const deleteUser = async (req: Request, res: Response):Promise<void> => {
     const id_user = Number(req.params.id);
     try {
@@ -254,4 +277,5 @@ export default {
     crownUser,
     deleteUser,
     getUserForAny,
+    setProfilePicture,
 };
