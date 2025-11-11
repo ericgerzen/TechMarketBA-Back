@@ -134,6 +134,56 @@ const getFavourite = async (id_user: number): Promise<any[]> => {
     return rows;
 }
 
+const searchProducts = async (
+    searchTerm: string,
+    limit: number = 20,
+    offset: number = 0
+): Promise<any[]> => {
+
+    const exactMatchTerm = searchTerm;
+    const wildcardSearchTerm = `%${searchTerm}%`;
+
+    const { rows } = await pool.query(`
+        SELECT 
+            p.*, 
+            u.name AS seller_name,
+            u.surname AS seller_surname,
+            COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images,
+            
+            -- This CASE statement creates the "relevance" score
+            -- Lower numbers are MORE relevant
+            CASE
+                WHEN p.name ILIKE $1 THEN 1  -- Exact name match = 1st priority
+                WHEN p.name ILIKE $2 THEN 2  -- Partial name match = 2nd priority
+                WHEN p.category ILIKE $2 THEN 3 -- Category match = 3rd priority
+                WHEN p.model ILIKE $2 THEN 4 -- Model match = 4th priority
+                WHEN p.description ILIKE $2 THEN 5 -- Description match = 5th priority
+                ELSE 6 -- Should not happen due to WHERE clause, but good practice
+            END as relevance
+            
+        FROM products p
+        LEFT JOIN images i ON p.id_product = i.id_product
+        LEFT JOIN users u ON p.id_user = u.id_user
+        WHERE 
+            p.approved = true 
+            AND (
+                -- The WHERE clause finds ALL possible matches
+                p.name ILIKE $2 OR
+                p.description ILIKE $2 OR
+                p.category ILIKE $2 OR
+                p.model ILIKE $2
+            )
+        GROUP BY p.id_product, u.name, u.surname
+        ORDER BY
+            relevance ASC,  -- Sort by our relevance score (1, 2, 3...)
+            p.name ASC      -- As a tie-breaker, sort alphabetically
+        LIMIT $3  -- Apply pagination limit
+        OFFSET $4 -- Apply pagination offset
+    `, [exactMatchTerm, wildcardSearchTerm, limit, offset]);
+
+    return rows;
+};
+
 const createProduct = async (
     name: string,
     description: string,
@@ -249,6 +299,7 @@ export default {
     getProductByUser,
     getProductByUserSelf,
     getCart,
+    searchProducts,
     getFavourite,
     createProduct,
     updateProduct,

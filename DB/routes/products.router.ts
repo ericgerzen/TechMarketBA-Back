@@ -12,6 +12,7 @@ router.get('/approved/:id', productsController.getApprovedProduct);
 router.get('/user/:id', productsController.getProductByUser);
 router.get('/self', auth.verifyToken, productsController.getProductByUserSelf);
 router.get('/cart', auth.verifyToken, productsController.getCart);
+router.get('/search/:term', productsController.searchProducts);
 router.get('/favourite', auth.verifyToken, productsController.getFavourite);
 router.post('/', auth.verifyToken, auth.verifySeller, productsController.createProduct);
 router.post('/cart', auth.verifyToken, productsController.addToCart);

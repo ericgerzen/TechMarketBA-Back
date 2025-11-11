@@ -135,6 +135,46 @@ const getFavourite = async (req: AuthenticatedRequest, res: Response): Promise<v
     }
 }
 
+const searchProducts = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+        const { q, limit, offset } = req.query;
+
+        if (!q || typeof q !== 'string') {
+            res.status(400).json({
+                message: "A 'q' string query parameter is required for search."
+            });
+            return;
+        }
+
+        let numLimit: number | undefined = undefined;
+        if (limit && typeof limit === 'string') {
+            const parsedLimit = parseInt(limit, 10);
+            if (!isNaN(parsedLimit) && parsedLimit > 0) {
+                numLimit = parsedLimit;
+            }
+        }
+
+        let numOffset: number | undefined = undefined;
+        if (offset && typeof offset === 'string') {
+            const parsedOffset = parseInt(offset, 10);
+            if (!isNaN(parsedOffset) && parsedOffset >= 0) {
+                numOffset = parsedOffset;
+            }
+        }
+
+        const results = await productsService.searchProducts(
+            q,
+            numLimit,
+            numOffset
+        );
+
+        res.json(results);
+
+    } catch (error) {
+        res.status(500).json({ message: "Could not search for item" });
+    }
+};
+
 const createProduct = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const { name, description, category, model, condition, price } = req.body;
     const id_user = req.id_user;
@@ -348,6 +388,7 @@ export default {
     getProductByUserSelf,
     getCart,
     getFavourite,
+    searchProducts,
     createProduct,
     updateProduct,
     approveProduct,
