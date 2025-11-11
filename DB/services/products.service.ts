@@ -17,11 +17,14 @@ const getApprovedProducts = async (): Promise<any[]> => {
     const { rows } = await pool.query(`
         SELECT 
             p.*, 
+            u.name AS seller_name,
+            u.surname AS seller_surname,
             COALESCE(array_agg(i.link) FILTER (WHERE i.link IS NOT NULL), '{}') AS images
         FROM products p
         LEFT JOIN images i ON p.id_product = i.id_product
+        LEFT JOIN users u ON p.id_user = u.id_user
         WHERE p.approved = true
-        GROUP BY p.id_product
+        GROUP BY p.id_product, u.name, u.surname
     `);
     return rows;
 };
