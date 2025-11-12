@@ -137,11 +137,13 @@ const getFavourite = async (req: AuthenticatedRequest, res: Response): Promise<v
 
 const searchProducts = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
-        const { q, limit, offset } = req.query;
+        const { term } = req.params;
 
-        if (!q || typeof q !== 'string') {
+        const { limit, offset } = req.query;
+
+        if (!term) {
             res.status(400).json({
-                message: "A 'q' string query parameter is required for search."
+                message: "A search term must be provided in the URL path."
             });
             return;
         }
@@ -163,7 +165,7 @@ const searchProducts = async (req: AuthenticatedRequest, res: Response): Promise
         }
 
         const results = await productsService.searchProducts(
-            q,
+            term,
             numLimit,
             numOffset
         );
